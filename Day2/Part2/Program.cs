@@ -16,10 +16,26 @@ foreach (var line in contents.Split("\n"))
     string[] items = line.Split();
 
     List<int> numbers = items.Select(int.Parse).ToList();
-    safeReportCount += IsReportSafe(numbers) ? 1 : 0;
+
+    if (IsReportSafe(numbers))
+    {
+        safeReportCount++;
+    }
+    else
+    {
+        int oldSafeReportCount = safeReportCount;
+        for (int i=0; i<numbers.Count; i++)
+        {
+            if (IsReportSafe(ListExceptIndex(numbers, i)))
+            {
+                safeReportCount++;
+                break;
+            }
+        }
+    }
 }
 
-Console.WriteLine($"Number of safe reports is {safeReportCount} from {reportCount}");
+Console.WriteLine($"Number of safe reports (with Problem Dampner applied) is {safeReportCount} from {reportCount}");
 
 static bool IsReportSafe(List<int> numbers)
 {
@@ -41,4 +57,9 @@ static bool IsReportSafe(List<int> numbers)
         }
     }
     return true;
+}
+
+static List<int> ListExceptIndex(List<int> numbers, int indexToRemove)
+{
+    return numbers.Where((v, i) => i != indexToRemove).ToList();
 }
