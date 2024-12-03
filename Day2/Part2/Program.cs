@@ -23,28 +23,26 @@ foreach (var line in contents.Split("\n"))
     }
     else
     {
-        int oldSafeReportCount = safeReportCount;
-        for (int i=0; i<numbers.Count; i++)
+        int unsafeReportProblemLevelIndex = GetUnsafeReportProblemLevelIndex(numbers);
+        if (IsReportSafe(ListExceptIndex(numbers, unsafeReportProblemLevelIndex)) ||
+            IsReportSafe(ListExceptIndex(numbers, unsafeReportProblemLevelIndex + 1)) ||
+            IsReportSafe(ListExceptIndex(numbers, 0)))
         {
-            if (IsReportSafe(ListExceptIndex(numbers, i)))
-            {
-                safeReportCount++;
-                break;
-            }
+            safeReportCount++;
         }
     }
 }
 
 Console.WriteLine($"Number of safe reports (with Problem Dampner applied) is {safeReportCount} from {reportCount}");
 
-static bool IsReportSafe(List<int> numbers)
+static int GetUnsafeReportProblemLevelIndex(List<int> numbers)
 {
     bool? ascending = null;
     for (int i=0; i<numbers.Count - 1; i++)
     {
         int difference = numbers[i] - numbers[i+1];
         if (Math.Abs(difference) > 3 || difference == 0)
-            return false;
+            return i;
 
         if (ascending == null)
         {
@@ -53,10 +51,15 @@ static bool IsReportSafe(List<int> numbers)
         else
         {
             if (ascending != difference < 0)
-                return false;
+                return i;
         }
     }
-    return true;
+    return -1;
+}
+
+static bool IsReportSafe(List<int> numbers)
+{
+    return GetUnsafeReportProblemLevelIndex(numbers) == -1;
 }
 
 static List<int> ListExceptIndex(List<int> numbers, int indexToRemove)
