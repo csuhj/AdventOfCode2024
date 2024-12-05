@@ -14,14 +14,6 @@ List<List<int>> pageUpdates = pageUpdateLines.Select(l => l.Split(",").Select(in
 
 List<List<int>> correctPageUpdates = pageUpdates.Where(pu => rules.All(r => r.MatchesRule(pu))).ToList();
 
-int sumOfMiddleNumberFromCorrectPageUpdates = 0;
-foreach (List<int> correctPageUpdate in correctPageUpdates)
-{
-    if (correctPageUpdate.Count % 2 == 0)
-        throw new Exception($"There are an even number of page numbers in update {correctPageUpdate}");
-
-    int middleIndex = (int)Math.Floor(correctPageUpdate.Count / 2.0);
-    sumOfMiddleNumberFromCorrectPageUpdates += correctPageUpdate[middleIndex];
-}
+int sumOfMiddleNumberFromCorrectPageUpdates = correctPageUpdates.Sum(pu => pu[pu.Count / 2]);
 
 Console.WriteLine($"Sum of middle number of {correctPageUpdates.Count} correctly ordered page updates (from a total of {pageUpdates.Count}), given {rules.Count} rules is {sumOfMiddleNumberFromCorrectPageUpdates}");
