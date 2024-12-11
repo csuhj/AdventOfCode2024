@@ -5,8 +5,7 @@ const string CookieFilePath = "../../session-cookie.txt";
 
 string contents = await DownloadHelper.DownloadInput(CookieFilePath, Url);
 
-string[] lines = contents.Split("\n").Where(l => !string.IsNullOrWhiteSpace(l)).ToArray();
-
+char[,] array = ArrayHelper.ReadIntoArray(contents);
 
 List<(int, int, char)> crossMas1 = new List<(int, int, char)>()
 {
@@ -43,12 +42,6 @@ List<List<(int, int, char)>> crossMases = new List<List<(int, int, char)>>() {
     crossMas3,
     crossMas4
 };
-
-// Map lines into array of columns x rows to make it slightly easier to see how this works
-char[,] array = new char[lines[0].Length, lines.Length];
-for (int x=0; x<array.GetLength(0); x++)
-    for (int y=0; y<array.GetLength(1); y++)
-        array[x, y] = lines[y][x];
 
 int numberOfInstancesOfCrossMas = 0;
 for (int x=0; x<array.GetLength(0); x++)
