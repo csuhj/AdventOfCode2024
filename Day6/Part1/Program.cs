@@ -12,9 +12,6 @@ if (guard == null)
 
 HashSet<Point> pointsCovered = new HashSet<Point>();
 
-Console.WriteLine("3, 1 = " + array[3,1]);
-Console.WriteLine("1, 3 = " + array[1,3]);
-
 while(InsideGrid(guard, array.GetLength(0), array.GetLength(1))) {
     if (array[guard.Location.X, guard.Location.Y] == '#') {
         guard.MoveBackwardsOneStep();
