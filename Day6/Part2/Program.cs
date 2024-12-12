@@ -15,14 +15,10 @@ HashSet<Point> loopingObstacleLocations = new HashSet<Point>();
 
 while(InsideGrid(guard, array.GetLength(0), array.GetLength(1)))
 {
-    var hypotheticalGuard = guard.Clone();
-    hypotheticalGuard.MoveForwardOneStep();
-
-    if (InsideGrid(hypotheticalGuard, array.GetLength(0), array.GetLength(1)) && array[hypotheticalGuard.Location.X, hypotheticalGuard.Location.Y] == '#') {
+    if (IsNextStepObstacle(guard)) {
         guard.Turn();
     } else {
-        hypotheticalGuard = guard.Clone();
-        if (guardPositionsCovered.Contains(hypotheticalGuard.Turn()))
+        if (LookaheadForCoveredPosition(guard.Clone().Turn(), guardPositionsCovered))
             loopingObstacleLocations.Add(guard.Clone().MoveForwardOneStep().Location);
 
         guardPositionsCovered.Add(guard.Clone());
@@ -32,6 +28,33 @@ while(InsideGrid(guard, array.GetLength(0), array.GetLength(1)))
 
 Console.WriteLine($"The total number of unique locations the guard visited was {guardPositionsCovered.Select(g => g.Location).Distinct().Count()}");
 Console.WriteLine($"The number of possible places that you could place a single obstacle to induce a loop in the guard's walk is {loopingObstacleLocations.Count}");
+
+bool LookaheadForCoveredPosition(Guard guard, HashSet<Guard> guardPositionsCovered) {
+    HashSet<Guard> lookheadGuardPositionsCovered = new HashSet<Guard>();
+    
+    while(InsideGrid(guard, array.GetLength(0), array.GetLength(1)))
+    {
+        if (IsNextStepObstacle(guard)) {
+            guard.Turn();
+        } else {
+            if (lookheadGuardPositionsCovered.Contains(guard))
+                return true;
+
+            if (guardPositionsCovered.Contains(guard))
+                return true;
+
+            lookheadGuardPositionsCovered.Add(guard.Clone());
+            guard.MoveForwardOneStep();
+        }
+    } 
+    return false;
+}
+
+bool IsNextStepObstacle(Guard guard) {
+    var hypotheticalGuard = guard.Clone();
+    hypotheticalGuard.MoveForwardOneStep();
+    return InsideGrid(hypotheticalGuard, array.GetLength(0), array.GetLength(1)) && array[hypotheticalGuard.Location.X, hypotheticalGuard.Location.Y] == '#';
+}
 
 Guard? FindGuard(char[,] array) {
     for (int x=0; x<array.GetLength(0); x++)
