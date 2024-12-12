@@ -1,3 +1,5 @@
+using Utilities;
+
 public class Guard
 {
     public Point Location { get; set; }
