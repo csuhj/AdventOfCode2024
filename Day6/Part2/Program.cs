@@ -10,52 +10,62 @@ var guard = FindGuard(array);
 if (guard == null)
     throw new Exception("Couldn't find guard to start with!");
 
-var guardStartingPoint = guard.Location;
-HashSet<Guard> guardPositionsCovered = new HashSet<Guard>();
+var initialGuard = guard.Clone();
+HashSet<Point> pointsCovered = new HashSet<Point>();
 HashSet<Point> loopingObstacleLocations = new HashSet<Point>();
 
 while(InsideGrid(guard, array.GetLength(0), array.GetLength(1)))
 {
-    if (IsNextStepObstacle(guard)) {
+    if (IsNextStepObstacle(guard, array)) {
         guard.Turn();
     } else {
-        if (LookaheadForCoveredPosition(guard.Clone().Turn(), guardPositionsCovered))
-            loopingObstacleLocations.Add(guard.Clone().MoveForwardOneStep().Location);
-
-        guardPositionsCovered.Add(guard.Clone());
+        pointsCovered.Add(guard.Location);
         guard.MoveForwardOneStep();
     }
 }
 
-Console.WriteLine($"The total number of unique locations the guard visited was {guardPositionsCovered.Select(g => g.Location).Distinct().Count()}");
-Console.WriteLine($"The number of possible places that you could place a single obstacle to induce a loop in the guard's walk is {loopingObstacleLocations.Count}");
+Console.WriteLine($"The total number of unique locations the guard visited was {pointsCovered.Count}");
 
-if (loopingObstacleLocations.Contains(guardStartingPoint)) {
-    Console.WriteLine($"It looks like the guard's starting point {guardStartingPoint} is one of the possible places that you could place an obstacle to induce a loop in the guard's walk, so excluding this the total number of available locations to place an obstacle is {loopingObstacleLocations.Count - 1}");
+int numberOfPointsTried = 0;
+foreach (Point point in pointsCovered)
+{
+    if (numberOfPointsTried % 100 == 0)
+        Console.WriteLine($"Tried {numberOfPointsTried} points so far, found {loopingObstacleLocations.Count} new obstacle locations");
+
+    if (DoesLoopExist(initialGuard.Clone(), point))
+        loopingObstacleLocations.Add(point);
+
+    numberOfPointsTried++;
 }
 
-bool LookaheadForCoveredPosition(Guard guard, HashSet<Guard> guardPositionsCovered) {
-    HashSet<Guard> lookheadGuardPositionsCovered = new HashSet<Guard>();
+Console.WriteLine($"The number of possible places that you could place a single obstacle to induce a loop in the guard's walk is {loopingObstacleLocations.Count}");
+
+if (loopingObstacleLocations.Contains(initialGuard.Location)) {
+    Console.WriteLine($"It looks like the guard's starting point {initialGuard.Location} is one of the possible places that you could place an obstacle to induce a loop in the guard's walk, so excluding this the total number of available locations to place an obstacle is {loopingObstacleLocations.Count - 1}");
+}
+
+bool DoesLoopExist(Guard guard, Point newObstacle) {
+    char[,] arrayWithNewObstacle = (char[,])array.Clone();
+    arrayWithNewObstacle[newObstacle.X, newObstacle.Y] = '#';
+
+    HashSet<Guard> positionsCovered = new HashSet<Guard>();
     
-    while(InsideGrid(guard, array.GetLength(0), array.GetLength(1)))
+    while(InsideGrid(guard, arrayWithNewObstacle.GetLength(0), arrayWithNewObstacle.GetLength(1)))
     {
-        if (lookheadGuardPositionsCovered.Contains(guard))
+        if (positionsCovered.Contains(guard))
             return true;
 
-        if (guardPositionsCovered.Contains(guard))
-            return true;
-
-        if (IsNextStepObstacle(guard)) {
+        if (IsNextStepObstacle(guard, arrayWithNewObstacle)) {
             guard.Turn();
         } else {
-            lookheadGuardPositionsCovered.Add(guard.Clone());
+            positionsCovered.Add(guard.Clone());
             guard.MoveForwardOneStep();
         }
-    } 
+    }
     return false;
 }
 
-bool IsNextStepObstacle(Guard guard) {
+bool IsNextStepObstacle(Guard guard, char[,] array) {
     var hypotheticalGuard = guard.Clone();
     hypotheticalGuard.MoveForwardOneStep();
     return InsideGrid(hypotheticalGuard, array.GetLength(0), array.GetLength(1)) && array[hypotheticalGuard.Location.X, hypotheticalGuard.Location.Y] == '#';
