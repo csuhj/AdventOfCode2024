@@ -1,7 +1,7 @@
 ﻿using Utilities;
 
 const string Url = "2024/day/9/input";
-const string CookieFilePath = "../../../../../session-cookie.txt";
+const string CookieFilePath = "../../session-cookie.txt";
 
 string contents = await DownloadHelper.DownloadInput(CookieFilePath, Url);
 contents = contents.Substring(0, contents.Length - 1);
