@@ -27,19 +27,27 @@ Console.WriteLine($"From file map of length {contents.Length} found {files.Count
 
 for (int i=files.Count - 1; i >= 0; i--)
 {
-    int indexOfSuitableFreeSpace = files.FindIndex(x => x.IsFreeSpace && x.NumbeOfBlocks >= files[i].NumbeOfBlocks);
-    if (indexOfSuitableFreeSpace != -1)
+    if (files[i].IsFreeSpace)
+        continue;
+
+    File fileToMove = files[i];
+
+    int indexOfSuitableFreeSpace = files.FindIndex(0, i, x => x.IsFreeSpace && x.NumberOfBlocks >= files[i].NumberOfBlocks);
+    if (indexOfSuitableFreeSpace == -1)
+        continue;
+
+    File freeSpace = files[indexOfSuitableFreeSpace];
+
+    if (freeSpace.NumberOfBlocks > fileToMove.NumberOfBlocks)
     {
-        if (files[indexOfSuitableFreeSpace].NumbeOfBlocks > files[i].NumbeOfBlocks)
-        {
-            File remainingFreeSpace = new File(-1, files[indexOfSuitableFreeSpace].NumbeOfBlocks - files[i].NumbeOfBlocks);
-            files.Insert(indexOfSuitableFreeSpace + 1, remainingFreeSpace);
-            if (indexOfSuitableFreeSpace < i)
-                i++;
-        }
-        files[indexOfSuitableFreeSpace] = files[i];
-        files.RemoveAt(i);
+        File remainingFreeSpace = new File(-1, freeSpace.NumberOfBlocks - fileToMove.NumberOfBlocks);
+        freeSpace = new File(-1, fileToMove.NumberOfBlocks);
+        files.Insert(indexOfSuitableFreeSpace + 1, remainingFreeSpace);
+        if (indexOfSuitableFreeSpace < i)
+            i++;
     }
+    files[indexOfSuitableFreeSpace] = fileToMove;
+    files[i] = freeSpace;
 }
 
 Console.WriteLine($"After packing without fragmentation now have {files.Count} files - of which {files.Count(f => !f.IsFreeSpace)} are not free space");
@@ -50,13 +58,12 @@ foreach (File file in files)
 {
     if (!file.IsFreeSpace)
     {
-        for (int i=blockPointer; i<blockPointer + file.NumbeOfBlocks; i++)
+        for (int i=blockPointer; i<blockPointer + file.NumberOfBlocks; i++)
         {
             sum += i * file.FileId;
         }
     }
-    blockPointer += file.NumbeOfBlocks;
+    blockPointer += file.NumberOfBlocks;
 }
 
-Console.WriteLine($"The sum of {files.Where(f => !f.IsFreeSpace).Sum(f => f.NumbeOfBlocks)} file blocks is {sum}");
-//Between [4486081281] 6,276,589,684,123 and 27,554,557,063,531
+Console.WriteLine($"The sum of {files.Where(f => !f.IsFreeSpace).Sum(f => f.NumberOfBlocks)} file blocks is {sum}");
