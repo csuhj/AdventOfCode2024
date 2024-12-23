@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Utilities;
+using DotNetMath.SimEq;
 
 public class ClawMachine
 {
@@ -10,7 +11,7 @@ public class ClawMachine
     public ClawMachine(Vector buttonAVector, Vector buttonBVector, Point prizeLocation)
     {
         ButtonAVector = buttonAVector;
-        ButtonBVector  = buttonBVector;
+        ButtonBVector = buttonBVector;
         PrizeLocation = prizeLocation;
     }
 
@@ -36,5 +37,22 @@ public class ClawMachine
         PrizeLocation = new Point(int.Parse(prizeLocationMatch.Groups[1].Value), int.Parse(prizeLocationMatch.Groups[2].Value));
     }
 
-    public int FindOptimal
+    public bool TrySolve(out (int, int) solution)
+    {
+        SimEqSolver solver = new SimEqSolver(2);
+        solver.AddEquation(new double[] { ButtonAVector.X, ButtonBVector.X }, PrizeLocation.X );
+        solver.AddEquation(new double[] { ButtonAVector.Y, ButtonBVector.Y }, PrizeLocation.Y );
+        double[] solutions = solver.Solve();
+
+        double solution1 = Math.Round(solutions[0], 6);
+        double solution2 = Math.Round(solutions[1], 6);
+        if (solution1 % 1 != 0 || solution2 % 1 != 0)
+        {
+            solution = (0, 0);
+            return false;
+        }
+
+        solution = ((int)solution1, (int)solution2);
+        return true;
+    }
 }

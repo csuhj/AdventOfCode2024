@@ -42,5 +42,17 @@ foreach (var name in nameToContentsMap.Keys)
         i++;
     }
 
-    Console.WriteLine($"For {name}, there are {machines.Count} claw machines");
+    int numberOfSolvableMachines = 0;
+    int totalNumberOfTokensNeeded = 0;
+    foreach (var machine in machines)
+    {
+        if (machine.TrySolve(out (int, int)solution))
+        {
+            numberOfSolvableMachines++;
+            totalNumberOfTokensNeeded += (solution.Item1 * 3);
+            totalNumberOfTokensNeeded += solution.Item2;
+        }
+    }
+
+    Console.WriteLine($"For {name}, there are {machines.Count} claw machines, of which {numberOfSolvableMachines} are solvable and a total number of button presses of {totalNumberOfTokensNeeded}");
 }

@@ -10,5 +10,9 @@
   <ItemGroup>
     <ProjectReference Include="../../Utilities/Utilities.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetMath" Version="1.5.2" />
+  </ItemGroup>
   
 </Project>
