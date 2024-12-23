@@ -1,7 +1,7 @@
 ﻿using Utilities;
 
 const string Url = "2024/day/12/input";
-const string CookieFilePath = "../../../../../session-cookie.txt";
+const string CookieFilePath = "../../session-cookie.txt";
 
 string exampleContents1 = 
     "AAAA\n"+
