@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Utilities;
 
-public struct ClawMachine
+public class ClawMachine
 {
     public Vector ButtonAVector { get; }
     public Vector ButtonBVector { get; }
@@ -35,4 +35,6 @@ public struct ClawMachine
         ButtonBVector = new Vector(int.Parse(buttonBMatch.Groups[2].Value), int.Parse(buttonBMatch.Groups[3].Value));
         PrizeLocation = new Point(int.Parse(prizeLocationMatch.Groups[1].Value), int.Parse(prizeLocationMatch.Groups[2].Value));
     }
+
+    public int FindOptimal
 }
